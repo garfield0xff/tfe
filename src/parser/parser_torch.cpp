@@ -37,9 +37,20 @@ void TorchParser::parseFile(const std::string& file_name) {
   model_name_       = file_name.substr(last_slash + 1, last_dot - last_slash - 1);
 
   try {
+    // IR Version
     version_    = read_file_from_zip(uf, model_name_ + "/version");
+    // Little / Big endian
     byte_order_ = read_file_from_zip(uf, model_name_ + "/byteorder");
-
+    // tensor, stoarge, dtype, shape
+    // TODO: Encoding 깨짐 
+    data_       = read_file_from_zip(uf, model_name_ + "/data.pkl");
+    // constants value for model
+    constants_  = read_file_from_zip(uf, model_name_ + "/constants.pkl");
+    // torch script code ( model structure )
+    code_        = read_file_from_zip(uf, model_name_ + "/code/__torch__.py");
+    // operation code & graph
+    bytecode_    = read_file_from_zip(uf, model_name_ + "/bytecode.pkl");
+    // TODO: archive ( data directory for tensor layer ) ex : /archive/data_0
   } catch (const error::ParserException& e) {
     unzClose(uf);
     throw;
@@ -53,6 +64,8 @@ std::string TorchParser::getVersion() const { return version_; }
 std::string TorchParser::getByteOrder() const { return byte_order_; }
 
 std::string TorchParser::getFileSize() const { return file_size_; }
+
+std::string TorchParser::getData() const { return data_; }
 
 std::string TorchParser::read_file_from_zip(unzFile uf, const std::string& internal_path) {
   if (unzLocateFile(uf, internal_path.c_str(), 0) != UNZ_OK) {

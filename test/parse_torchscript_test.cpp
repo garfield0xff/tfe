@@ -16,6 +16,7 @@ TEST_F(TorchParserTest, ParseTest) {
   std::string version    = parser->getVersion();
   std::string byte_order = parser->getByteOrder();
   std::string filesize   = parser->getFileSize();
+  std::string data       = parser->getData();
 
   EXPECT_FALSE(version.empty());
   EXPECT_FALSE(byte_order.empty());
@@ -24,4 +25,5 @@ TEST_F(TorchParserTest, ParseTest) {
   std::cout << "version   : " << version << std::endl;
   std::cout << "byteOrder : " << byte_order << std::endl;
   std::cout << "fileSize  : " << filesize << std::endl;
+  std::cout << "data      : " << data << std::endl;
 }
