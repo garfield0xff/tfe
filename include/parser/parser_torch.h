@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "parser/parser_base.h"
 
@@ -20,6 +21,8 @@ class TorchParser : public BaseParser {
   ~TorchParser() override;
 
   void parseFile(const std::string& file_name) override;
+  void read(const std::string& file_name);
+
   std::string getVersion() const override;
   std::string getByteOrder() const override;
   std::string getFileSize() const override;

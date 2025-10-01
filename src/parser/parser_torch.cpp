@@ -15,9 +15,10 @@ TorchParser::TorchParser() {}
 TorchParser::~TorchParser() {}
 
 /**
- * @brief TorchScript 파일 파싱
+ * @brief TorchScript 파일 파싱 (1안)
  * @note TorchScript ( version, byteorder 완료 ) , ( storage_type, tensor_shape, tensor_data,
- * storage_offset, state_dict_keys, optimizer_state 구현 필요)
+ * storage_offset, state_dict_keys, optimizer_state 구현 필요) 
+ * TODO: 구조 잘못됌 iterator로 파일 내부적으로 순회해서 처리
  * @date 2025-10-01
  * @param file_name
  */
@@ -48,8 +49,8 @@ void TorchParser::parseFile(const std::string& file_name) {
     constants_  = read_file_from_zip(uf, model_name_ + "/constants.pkl");
     // torch script code ( model structure )
     code_        = read_file_from_zip(uf, model_name_ + "/code/__torch__.py");
-    // operation code & graph
-    bytecode_    = read_file_from_zip(uf, model_name_ + "/bytecode.pkl");
+    // operation code & graph -> 이거 없음 확인
+    // bytecode_    = read_file_from_zip(uf, model_name_ + "/bytecode.pkl");
     // TODO: archive ( data directory for tensor layer ) ex : /archive/data_0
   } catch (const error::ParserException& e) {
     unzClose(uf);
@@ -58,6 +59,45 @@ void TorchParser::parseFile(const std::string& file_name) {
 
   unzClose(uf);
 }
+
+/**
+ * @brief TorchScript 파싱 2안 (iterator)
+ * @note 텐서를 구축후에 넣어야 할 것 같은데 사이즈 할당에 대해서 공부 필요
+ * https://github.com/apache/tvm/blob/main/include/tvm/te/tensor.h 참고
+ * @date 2025-10-01
+ */
+void TorchParser::read(const std::string& file_name) {
+  std::map<std::string, std::vector<char>> file_data;
+  unzFile zipfile = unzOpen(file_name.c_str());
+  if (!zipfile) {
+    throw error::ParserException(error::OPEN_FAILED, "Failed to open file: " + file_name);
+  }
+  
+  unz_global_info global_info;
+  unzGetGlobalInfo(zipfile, &global_info);
+  // global_info.number_entry return type is unsigned long
+  for(unsigned long i = 0; i < global_info.number_entry; i++) {
+    char file_inzip[256];
+    unz_file_info file_info;
+    unzGetCurrentFileInfo(zipfile, &file_info, file_inzip, sizeof(file_inzip), NULL, 0, NULL, 0);
+    if(unzOpenCurrentFile(zipfile) != UNZ_OK) {
+      throw error::ParserException(error::ZIP_ERROR, "Failed to parse internal file: " + file_name);
+    }
+
+    std::vector<char> buffer(file_info.uncompressed_size);
+    unzReadCurrentFile(zipfile, buffer.data(), buffer.size());
+    unzCloseCurrentFile(zipfile);
+
+    file_data[std::string(file_inzip)] = buffer;
+
+    if((i + 1) < global_info.number_entry) {
+      unzGoToNextFile(zipfile);
+    }
+  }
+  unzClose(zipfile);
+}
+
+
 
 std::string TorchParser::getVersion() const { return version_; }
 
