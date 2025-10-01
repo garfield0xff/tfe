@@ -1,0 +1,87 @@
+cmake_minimum_required(VERSION 3.18...3.27)
+project(tfe LANGUAGES CXX)
+
+# ------------------------------------------------------
+# CMAKE STANDARD
+# ------------------------------------------------------
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+
+# ------------------------------------------------------
+# toolchain
+# ------------------------------------------------------
+include(cmake/utils/FindSource.cmake)
+
+
+
+# ------------------------------------------------------
+# third party
+# ------------------------------------------------------
+include(FetchContent)
+
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        v1.14.0
+)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+FetchContent_Declare(
+    minizip
+    GIT_REPOSITORY https://github.com/zlib-ng/minizip-ng.git
+    GIT_TAG        4.0.7
+)
+
+set(MZ_COMPAT ON CACHE BOOL "" FORCE)
+set(MZ_ZLIB ON CACHE BOOL "" FORCE)
+set(MZ_BZIP2 OFF CACHE BOOL "" FORCE)
+set(MZ_LZMA OFF CACHE BOOL "" FORCE)
+set(MZ_ZSTD OFF CACHE BOOL "" FORCE)
+set(MZ_OPENSSL OFF CACHE BOOL "" FORCE)
+set(MZ_LIBBSD OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(minizip)
+
+
+# ------------------------------------------------------
+# source
+# ------------------------------------------------------
+tfe_find_glob(PARSER_SOURCES "src/parser/*.cpp")
+tfe_find_glob(MAIN_SOURCES "src/main.cpp")
+tfe_find_glob(TEST_SOURCES "test/*.cpp")
+tfe_find_glob(TEST_HEADERS "test/*.h")
+
+set(ALL_SOURCES
+    ${PARSER_SOURCES}
+    ${MAIN_SOURCES}
+)
+
+
+# ------------------------------------------------------
+#  link
+# ------------------------------------------------------
+add_executable(tfe ${ALL_SOURCES})
+
+target_include_directories(tfe PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(tfe PRIVATE minizip)
+
+# ------------------------------------------------------
+# testing
+# ------------------------------------------------------
+enable_testing()
+
+add_executable(tfe_tests ${TEST_SOURCES} ${TEST_HEADERS} ${PARSER_SOURCES})
+target_include_directories(tfe_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/include
+)
+target_link_libraries(tfe_tests PRIVATE gtest_main minizip)
+
+add_test(NAME tfe_unit_tests COMMAND tfe_tests)
