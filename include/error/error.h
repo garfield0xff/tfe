@@ -11,6 +11,7 @@ typedef enum {
   PARSER_SUCCESS = 0,
   OPEN_FAILED,
   READ_FAILED,
+  PARSE_ERROR,
   ZIP_ERROR = -101,
 } ParseError;
 

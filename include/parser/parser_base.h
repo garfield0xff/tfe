@@ -17,7 +17,7 @@ class BaseParser {
   BaseParser()          = default;
   virtual ~BaseParser() = default;
 
-  virtual void parseFile(const std::string& file_name) = 0;
+  virtual void read(const std::string& file_name) = 0;
   virtual std::string getVersion() const               = 0;
   virtual std::string getByteOrder() const             = 0;
   virtual std::string getFileSize() const              = 0;

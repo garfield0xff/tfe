@@ -3,9 +3,9 @@
 
 #include <unzip.h>
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "parser/parser_base.h"
 
@@ -20,8 +20,7 @@ class TorchParser : public BaseParser {
   TorchParser();
   ~TorchParser() override;
 
-  void parseFile(const std::string& file_name) override;
-  void read(const std::string& file_name);
+  void read(const std::string& file_name) override;
 
   std::string getVersion() const override;
   std::string getByteOrder() const override;
@@ -29,7 +28,12 @@ class TorchParser : public BaseParser {
   std::string getData() const override;
 
  private:
+  void parse(unzFile);
   std::string read_file_from_zip(unzFile uf, const std::string& internal_path);
+
+  
+  std::string version_;
+  std::string byte_order_;
   std::string model_name_;
 };
 

@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
 
   try {
     tfe::parser::TorchParser parser;
-    parser.parseFile(argv[1]);
+    parser.read(argv[1]);
 
     std::cout << "Version: " << parser.getVersion() << std::endl;
     std::cout << "Byte Order: " << parser.getByteOrder() << std::endl;
