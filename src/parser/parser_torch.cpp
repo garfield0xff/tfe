@@ -57,12 +57,7 @@ void TorchParser::parse(unzFile zipfile) {
     version_ = read_file_from_zip(zipfile, model_name_ + "/version");
     byte_order_ = read_file_from_zip(zipfile, model_name_ + "/byteorder");
     std::string data_pkl = read_file_from_zip(zipfile, model_name_ + "/data.pkl");
-
-    // parse pkl 
-    PickleParser pkl_parser;
-    pkl_parser.parse(data_pkl);
-    std::cout << pkl_parser.getStructure() << std::endl;
-
+    
   } catch (const error::ParserException& e) {
     unzClose(zipfile);
     throw;

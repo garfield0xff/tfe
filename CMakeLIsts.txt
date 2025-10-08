@@ -50,12 +50,14 @@ FetchContent_MakeAvailable(minizip)
 # source
 # ------------------------------------------------------
 tfe_find_glob(PARSER_SOURCES "src/parser/*.cpp")
+tfe_find_glob(VM_SOURCES "src/vm/*.cpp")
 tfe_find_glob(MAIN_SOURCES "src/main.cpp")
 tfe_find_glob(TEST_SOURCES "test/*.cpp")
 tfe_find_glob(TEST_HEADERS "test/*.h")
 
 set(ALL_SOURCES
     ${PARSER_SOURCES}
+    ${VM_SOURCES}
     ${MAIN_SOURCES}
 )
 
@@ -77,7 +79,7 @@ target_link_libraries(tfe PRIVATE minizip)
 # ------------------------------------------------------
 enable_testing()
 
-add_executable(tfe_tests ${TEST_SOURCES} ${TEST_HEADERS} ${PARSER_SOURCES})
+add_executable(tfe_tests ${TEST_SOURCES} ${TEST_HEADERS} ${PARSER_SOURCES} ${VM_SOURCES})
 target_include_directories(tfe_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/include
