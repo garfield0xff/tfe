@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <string>
 #include <string_view>
 
 namespace tfe {
@@ -56,6 +57,54 @@ enum class OpCode : uint8_t {
     SETITEMS        = 'u',  // modify dict by adding topmost key+value pairs
     BINFLOAT        = 'G',  // push float; arg is 8-byte float encoding
 };
+
+// Convert OpCode to string representation
+inline std::string opCodeToString(OpCode opcode) {
+    switch (opcode) {
+        case OpCode::MARK:            return "MARK";
+        case OpCode::STOP:            return "STOP";
+        case OpCode::POP:             return "POP";
+        case OpCode::POP_MARK:        return "POP_MARK";
+        case OpCode::DUP:             return "DUP";
+        case OpCode::FLOAT:           return "FLOAT";
+        case OpCode::INT:             return "INT";
+        case OpCode::BININT:          return "BININT";
+        case OpCode::BININT1:         return "BININT1";
+        case OpCode::LONG:            return "LONG";
+        case OpCode::BININT2:         return "BININT2";
+        case OpCode::NONE:            return "NONE";
+        case OpCode::PERSID:          return "PERSID";
+        case OpCode::BINPERSID:       return "BINPERSID";
+        case OpCode::REDUCE:          return "REDUCE";
+        case OpCode::STRING:          return "STRING";
+        case OpCode::BINSTRING:       return "BINSTRING";
+        case OpCode::SHORT_BINSTRING: return "SHORT_BINSTRING";
+        case OpCode::UNICODE:         return "UNICODE";
+        case OpCode::BINUNICODE:      return "BINUNICODE";
+        case OpCode::APPEND:          return "APPEND";
+        case OpCode::BUILD:           return "BUILD";
+        case OpCode::GLOBAL:          return "GLOBAL";
+        case OpCode::DICT:            return "DICT";
+        case OpCode::EMPTY_DICT:      return "EMPTY_DICT";
+        case OpCode::APPENDS:         return "APPENDS";
+        case OpCode::GET:             return "GET";
+        case OpCode::BINGET:          return "BINGET";
+        case OpCode::INST:            return "INST";
+        case OpCode::LONG_BINGET:     return "LONG_BINGET";
+        case OpCode::LIST:            return "LIST";
+        case OpCode::EMPTY_LIST:      return "EMPTY_LIST";
+        case OpCode::OBJ:             return "OBJ";
+        case OpCode::PUT:             return "PUT";
+        case OpCode::BINPUT:          return "BINPUT";
+        case OpCode::LONG_BINPUT:     return "LONG_BINPUT";
+        case OpCode::SETITEM:         return "SETITEM";
+        case OpCode::TUPLE:           return "TUPLE";
+        case OpCode::EMPTY_TUPLE:     return "EMPTY_TUPLE";
+        case OpCode::SETITEMS:        return "SETITEMS";
+        case OpCode::BINFLOAT:        return "BINFLOAT";
+        default:                      return "UNKNOWN";
+    }
+}
 
 
 

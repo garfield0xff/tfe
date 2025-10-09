@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include "error/error.h"
-#include "parser/parser_pkl.h"
 
 namespace tfe {
 namespace parser {
@@ -56,8 +55,8 @@ void TorchParser::parse(unzFile zipfile) {
   try {
     version_ = read_file_from_zip(zipfile, model_name_ + "/version");
     byte_order_ = read_file_from_zip(zipfile, model_name_ + "/byteorder");
-    std::string data_pkl = read_file_from_zip(zipfile, model_name_ + "/data.pkl");
-    
+    data_ = read_file_from_zip(zipfile, model_name_ + "/data.pkl");
+
   } catch (const error::ParserException& e) {
     unzClose(zipfile);
     throw;

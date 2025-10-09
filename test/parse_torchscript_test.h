@@ -2,9 +2,7 @@
 #define PARSE_TORCHSCRIPT_TEST_H_
 
 #include <gtest/gtest.h>
-
 #include <memory>
-
 #include "parser/parser_torch.h"
 
 class TorchParserTest : public ::testing::Test {
