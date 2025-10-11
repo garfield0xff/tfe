@@ -1,15 +1,18 @@
 #include "vm_pkl_test.h"
 
 #include <iostream>
+#include <fstream>
 #include "parser/parser_torch.h"
 #include "vm/op_pkl.h"
+#include "vm/vm_pkl.h"
 
 void VmPickleTest::SetUp() { stack_.clear(); }
 
 void VmPickleTest::TearDown() { stack_.clear(); }
 
 TEST_F(VmPickleTest, ParseOpCodesTest) {
-  const std::string test_file = "/Users/gyujinkim/Desktop/Github/tfe/model/mono_640x192_decoder.pt";
+  const std::string test_file = "/Users/gyujinkim/Desktop/Github/tfe/model/mono_640x192_encoder.pt";
+  const std::string output_file = "../test/parse_pkl.txt";
 
   auto parser = std::make_unique<tfe::parser::TorchParser>();
   ASSERT_NO_THROW({ parser->read(test_file); });
@@ -19,26 +22,24 @@ TEST_F(VmPickleTest, ParseOpCodesTest) {
 
   std::vector<char> data(data_pkl.begin(), data_pkl.end());
 
-  size_t pos = 0;
-  while (pos < data.size()) {
-    uint8_t opcode_byte = static_cast<uint8_t>(data[pos++]);
-    tfe::vm::OpCode opcode = static_cast<tfe::vm::OpCode>(opcode_byte);
+  tfe::vm::PickleVM pkl_vm(data);
+  std::vector<std::string> opcodes;
 
-    std::string opcode_str = tfe::vm::opCodeToString(opcode);
-    stack_.push_back(opcode_str);
+  ASSERT_NO_THROW({
+    opcodes = pkl_vm.parse();
+  });
 
-    if (opcode == tfe::vm::OpCode::STOP) {
-      break;
-    }
+  std::ofstream out_file(output_file);
+  ASSERT_TRUE(out_file.is_open()) << "Failed to open output file: " << output_file;
+
+  size_t count = 0;
+  for (const auto& opcode_str : opcodes) {
+    out_file << opcode_str << std::endl;
   }
 
-  std::cout << "\n=== Pickle OpCodes ===" << std::endl;
-  for (const auto& opcode_name : stack_) {
-    std::cout << opcode_name << std::endl;
-  }
-  std::cout << "=====================\n" << std::endl;
+  out_file.close();
+  std::cout << "\nParsed opcodes saved to: " << output_file << std::endl;
 
-  // 최소한 STOP opcode는 있어야 함
-  EXPECT_FALSE(stack_.empty());
-  EXPECT_EQ(stack_.back(), "STOP");
+  EXPECT_FALSE(opcodes.empty());
+  EXPECT_EQ(opcodes.back(), "STOP");
 }

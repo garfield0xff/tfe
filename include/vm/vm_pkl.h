@@ -7,23 +7,60 @@
 
 #include "vm/op_pkl.h"
 #include <vector>
+#include <string>
+#include <sstream>
+#include <iomanip>
 
 namespace tfe {
 namespace vm {
+
 class PickleVM {
 public:
- PickleVM();
- ~PickleVM();
+    PickleVM(const std::vector<char>& data) : data_(data), pos_(0) {}
 
-  void parseOpcodes(const std::vector<char>& data);
-  int32_t readInt32(const std::vector<char>& data);
-  uint32_t readUInt32(const std::vector<char>& data);
-  int16_t readInt16(const std::vector<char>& data);
-  uint16_t readUInt16(const std::vector<char>& data);
-  uint8_t readUInt8(const std::vector<char>& data);
-  double readFloat64(const std::vector<char>& data);
+    std::vector<std::string> parse();
+
 private:
+    const std::vector<char>& data_;
     size_t pos_;
+
+    // read byte per type (cstdint)
+    uint8_t readByte();
+    uint16_t readUint16();
+    uint32_t readUint32();
+    int32_t readInt32();
+    std::string readLine();
+    std::string readBytes(size_t count);
+
+    // parse logic by opcode
+    std::string parseProto();
+    std::string parseGlobal();
+    std::string parseBinunicode();
+    std::string parseBinstring();
+    std::string parseShortBinstring();
+    std::string parseBinint();
+    std::string parseBinint1();
+    std::string parseBinint2();
+    std::string parseBinget();
+    std::string parseLongBinget();
+    std::string parseBinput();
+    std::string parseLongBinput();
+    std::string parseBinpersid();
+    std::string parseGet();
+    std::string parsePut();
+    std::string parseBinbytes();
+    std::string parseShortBinbytes();
+    std::string parseShortBinunicode();
+    std::string parseBinunicode8();
+    std::string parseBinbytes8();
+    std::string parseLong1();
+    std::string parseLong4();
+    std::string parseFrame();
+    std::string parseMemoize();
+
+    // Utility
+    std::string bytesToHex(const std::string& bytes);
+    bool hasMore() const { return pos_ < data_.size(); }
 };
 
 } // namespace vm
